@@ -106,10 +106,12 @@ Use these files to seed DynamoDB tables during local testing or demo setup.
 - Use least-privilege roles for Lambda functions and CI/CD deployments.
 - Keep learner and admin applications separated by Cognito groups or equivalent authorization controls.
 - Store video/content assets in private S3 buckets unless the learning material is intended to be public.
+- Dependency audit has been reduced with safe `npm audit fix` updates. Remaining alerts are tied to older Create React App and Amplify v5 dependency trees and should be handled through a planned Amplify v6 / modern React build migration.
 
 ## Roadmap
 
-- Add automated CI for both React applications
+- Migrate from Create React App to Vite or another maintained React build tool
+- Upgrade Amplify packages from v5 to v6 with authentication/API regression testing
 - Document Amplify environment variables and backend resources
 - Add screenshots or a short demo walkthrough
 - Add seed scripts for course and lecture sample data
