@@ -1,95 +1,120 @@
-# LEARNING MANAGEMENT SYSTEM
+# CloudSecOp Platform MVP
 
-## 1. Architect Overview
-![architect](images/LMS.jpg)
-- Cloud Academy -> ***lms***
-- Cloud Academy -> ***lms-studio***
-## 2. Clone code:
-```bash
-$ git clone https://git-codecommit.ap-southeast-1.amazonaws.com/v1/repos/LMS
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-18-61DAFB.svg)](https://react.dev/)
+[![AWS Amplify](https://img.shields.io/badge/AWS-Amplify-FF9900.svg)](https://aws.amazon.com/amplify/)
+[![Cloud Security](https://img.shields.io/badge/Domain-Cloud%20Security-blue.svg)](#)
+
+CloudSecOp Platform MVP is a cloud security operations learning platform built with React and AWS Amplify. It provides a learner-facing LMS, an admin studio, course content, lectures, progress tracking, and certificate workflows for hands-on cloud security education.
+
+## What This Project Demonstrates
+
+- A full-stack learning platform built on AWS Amplify, React, DynamoDB, S3, Lambda, and API Gateway
+- Separate experiences for learners (`lms`) and content administrators (`lms-studio`)
+- Course and lecture data modeling for cloud security training programs
+- Certificate lookup and learner progress flows
+- A practical reference implementation for cloud security education communities
+
+## Architecture
+
+```mermaid
+flowchart LR
+    learner[Learner browser] --> lms[React LMS]
+    admin[Admin browser] --> studio[React Studio]
+    lms --> amplify[AWS Amplify hosting]
+    studio --> amplify
+    amplify --> auth[Amazon Cognito]
+    amplify --> api[API Gateway]
+    api --> lambda[AWS Lambda]
+    lambda --> dynamodb[DynamoDB tables]
+    amplify --> s3[S3 content storage]
 ```
 
-After that, check out git branch ```d_unicorm_gym_master```
+## Repository Structure
 
-## 2. Download Amplify CLI:  
-Follow below instructions in section "Install the Amplify CLI", and section "Configure the Amplify CLI": 
-[Amplify setup link](https://docs.amplify.aws/cli/start/install/#configure-the-amplify-cli)
-* **Note**: amplify configure will ask you to sign into the AWS Console. Remember to log into your own isengard account to sign into that AWS Console.
-* **Step**: "Specify the AWS Region" -> Choose Singapore Region.
-
-## 3. Init Amplify and connect your local env to the Cloud:
-- Check out git branch ```d_unicorm_gym_master``` before continue.
-- Open your local LMS root folder and do amplify setup with ***lms*** first:
-```bash
-$ cd lms/lms
-
-$ (sudo) amplify init
-
-? Enter a name for the environment: dev
-
-? Choose your default editor: <Choose your favorite editor>
-
-Using default provider  awscloudformation
-
-? Select the authentication method you want to use: AWS profile
-
-? Please choose the profile you want to use : <Choose the profile you created in Configure the Amplify CLI from section 2. Download Amplify CLI>
-
-$ amplify push
+```text
+cloudsecop-platform-mvp/
+├── lms/                  # Learner-facing React application
+├── lms-studio/           # Admin/content studio React application
+├── sample-data/          # Example course and lecture payloads
+├── LICENSE
+└── README.md
 ```
 
-- Similarly, do all above steps in this section 3 for ***lms***:
-Open your local LMS root folder, then:
+## Local Development
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+- AWS account with permissions to use Amplify, Cognito, Lambda, DynamoDB, S3, and API Gateway
+- Amplify CLI configured with an AWS profile
+
+Install the Amplify CLI if needed:
+
 ```bash
-$ cd lms/lms-studio
-
-$ (sudo) amplify init
-...
-```
-- When init ```lms-studio``` project, if amplify add for table to import, select ```courses-dev```.
-
-## 4. Check your apps are on or not:
-Open your own isengard account and go to "Amplify" service to check if your app is now shown on or not (apps'name:  ***lms***, ***lmsstudio***)   
-
-## 5. Run Frontend  from your local laptop:
-###5.1. How to run lms FE:
-Open your local LMS root folder, then:
-```bash
-$ cd LMS/lms/
-
-$ npm i
-
-$ npm start
+npm install -g @aws-amplify/cli
+amplify configure
 ```
 
-###5.2. How to run lms-studio FE:
-Open your local LMS root folder, then:
+### Run the learner app
+
 ```bash
-$ cd LMS/lms-studio/
-
-$ npm i
-
-$ npm start
+cd lms
+npm install
+npm start
 ```
 
-## 6. Add sample data to dynamodb tables
-Sample data for Course and Lecture tables are stored in sample-data folder.
-You can add these data to DynamoDB using JSON view when create new item in DynamoDB Console.
+### Run the admin studio
 
-## 7. How can we contribute to the source code ?
-Inside your cloned repository from section 1. From the ```d_unicorm_gym_master``` branch, create a new feature branch, naming convention: ```f_feature_name``` (E.g: ```f_create_course```).
+```bash
+cd lms-studio
+npm install
+npm start
+```
 
-You develope, test the project with that branch.
+Both applications use `react-scripts`; local development starts on the default Create React App port unless another app is already using it.
 
-After that, you create a pull request to the CodeCommit Git Repository inside mintuan's account.
+## Deploy With AWS Amplify
 
-mintuan will review and merge the pull requests from everyone.
+Initialize and deploy each application from its own folder:
 
-Development steps:
-- Implement UI with React JS.
-- Implement APIs and integrate with the UI:
-    - API Gateway and DynamoDB tables are already created, the lambda function named ```studioCourses``` for ```/courses/``` APIs is also created.
-    - If you need to import DynamoDB table or S3 bucket from LMS to LMS Studio project, run ```amplify import storage```.
-    - If you need to add new APIs and lambda functions, run ```amplify update api``` and add a new path.
-    - Use ```studio``` prefix for Lambda function name to avoid conflict with the LMS project. E.g: ```studioCourses```, ```studioLectures```.
-    - Please use Node JS for your Lambda function to ensure consistency, and don’t create new api gateway.
+```bash
+cd lms
+amplify init
+amplify push
+```
+
+Repeat the same flow for `lms-studio` if you want to deploy the admin application separately. Use separate environments such as `dev`, `staging`, and `prod` when testing infrastructure changes.
+
+## Sample Data
+
+Example course and lecture payloads are available in `sample-data/`:
+
+```text
+sample-data/
+├── course/Course.json
+└── lecture/Lecture-1.json ... Lecture-5.json
+```
+
+Use these files to seed DynamoDB tables during local testing or demo setup.
+
+## Security Notes
+
+- Do not commit generated AWS credentials, local environment files, or exported secrets.
+- Review Amplify-generated IAM policies before production use.
+- Use least-privilege roles for Lambda functions and CI/CD deployments.
+- Keep learner and admin applications separated by Cognito groups or equivalent authorization controls.
+- Store video/content assets in private S3 buckets unless the learning material is intended to be public.
+
+## Roadmap
+
+- Add automated CI for both React applications
+- Document Amplify environment variables and backend resources
+- Add screenshots or a short demo walkthrough
+- Add seed scripts for course and lecture sample data
+- Add role-based authorization examples for learner/admin workflows
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
